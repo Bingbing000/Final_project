@@ -2,7 +2,12 @@
 title: "Logistic regression analysis on breast cancer"
 author: "Bingbing Wu"
 date: "`r Sys.Date()`"
-output: html_document
+output:
+  html_document:
+    highlight: haddock
+    toc: true
+params:
+  production: TRUE
 ---
 
 # Introduction
@@ -31,11 +36,13 @@ library(caret)
 library(ggcorrplot)
 library(ggpubr)
 library(naniar)
+library(png)
+library(grid) 
 options(warn = -1)
 ```
 
 ```{r}
-here :: i_am ("code/Final_Project.Rmd")
+here :: i_am ("report.Rmd")
 ```
 
 ```{r}
@@ -66,28 +73,11 @@ saveRDS(
 )
 ```
 
-```{r}
-library(gtsummary)
-# making table 
-table <- df |>
-  select(`Clump.Thickness`, `Bare.Nuclei`, `Bland.Chromatin`, `Normal.Nucleoli`, `Marginal.Adhesion`, Class) |>
-  tbl_summary(by = Class) |>
-  modify_spanning_header(c("stat_1", "stat_2") ~ "Table 1") |>
-  add_overall() |>
-  add_p()
-
-saveRDS(
-  table,
-  file = here::here("output/Table.rds")
-)
-```
 
 ```{r}
-# finding correlations between the variables
-correlation <- cor(df[,1:10])
-heatmap <- ggcorrplot(correlation, type = "lower", lab = TRUE)
-
-ggsave("~/Desktop/FinalProject/output/correlation_heatmap.png", plot = heatmap)
+#read heat map
+heat_map <- readPNG(here::here("output", "correlation_heatmap.png"))
+grid.raster(heat_map)
 ```
 
 To determine the strength of the linear association between several variables, utilize the heatmap of a correlation matrix. Every grid cell in a correlation matrix displays the correlation coefficient between two variables. A statistical metric used to characterize the strength and direction of a relationship between two variables is the correlation coefficient.
@@ -103,298 +93,29 @@ It ranges from -1 to +1, where:
 5. 'Clump Thickness' also appears to be moderately correlated with 'Uniformity of Cell Size' and 'Uniformity of Cell Shape'.
 
 # Analysis Visulization
-#### clump thickness plot
 ```{r}
-# clump thickness plot
-ggplot() + 
-  geom_point(aes(df$Clump.Thickness, df$Class)) + 
-  geom_smooth(aes(df$Clump.Thickness, df$Class),
-              method = "glm", se = FALSE, method.args = list(family = "binomial"), 
-              color = "#557153", size = 1.2) +
-  ggtitle("Breast Cancer Diagnosis \nusing Clump Thickness") +
-  ylab("Tumour type") +
-  xlab("Clump thickness") +
-scale_y_continuous(breaks = c(0, 1), labels = c("Benign", "Malignant")) +
-  theme(plot.title = element_text(size = 25, face="bold",
-                                 margin = margin(10,0,10,0)),
-       plot.background = element_rect(fill = "#F0EBCE"),
-       panel.background = element_rect(fill = "#F0EBCE"),
-       axis.text.x = element_text(size = 15),
-       axis.title.x = element_text(size = 20, margin = margin(11,0,10,0)),
-       axis.text.y = element_text(size = 15),
-       axis.title.y = element_text(size = 20, margin=margin(0,10,0,11)),
-       panel.grid.major = element_blank(),
-       panel.grid.minor = element_blank(),
-       plot.margin = margin(0,0.5,0,0, "cm"))
+final_graph <- readPNG(here::here("output", "Final_graph.png"))
+grid.raster(final_graph)
 ```
 
-```{r}
-ct <- ggplot() + 
-  geom_point(aes(df$Clump.Thickness,df$Class)) + 
-  geom_smooth(aes(df$Clump.Thickness,df$Class),
-              method = "glm", se = FALSE, method.args = list(family = "binomial"), 
-              color = "#557153", size = 1.2) +
-scale_y_continuous(breaks = c(0, 1), labels = c("Benign", "Malignant")) +
-  theme(plot.background = element_rect(fill = "#F0EBCE"),
-       panel.background = element_rect(fill = "#F0EBCE"),
-       axis.text.x = element_text(size = 10),
-       axis.title.x = element_blank(),
-       axis.text.y = element_text(size = 10),
-       axis.title.y = element_blank(),
-       panel.grid.major = element_blank(),
-       panel.grid.minor = element_blank(),
-       plot.margin = margin(0,0.5, 0, 0, "cm")) +
-       annotate("text",x=7.0, y=0.2, label="Clump thickness", size = 6)
-
-ggsave(
-  here::here ("output/ct.png"), 
-  plot = ct)
-```
 For 'Clump Thickness', the plot indicates that as the thickness increases, the probability of the tumor being malignant also increases. Data points are plotted for benign and malignant tumors at various thickness levels, and the logistic regression curve suggests that there is a threshold of clump thickness above which tumors are more likely to be classified as malignant.
 
-#### marginal adhesion plot
-```{r}
-# marginal adhesion plot
-ggplot() + 
-  geom_point(aes(df$Marginal.Adhesion,df$Class)) + 
-  geom_smooth(aes(df$Marginal.Adhesion,df$Class),
-              method = "glm", se = FALSE, method.args = list(family = "binomial"), 
-              color = "#557153", size = 1.2) +
-  ggtitle("Breast Cancer Diagnosis \nusing Marginal adhesion") +
-  ylab("Tumour type") +
-  xlab("Marginal adhesion") +
-scale_y_continuous(breaks = c(0, 1), labels = c("Benign", "Malignant")) +
-  theme(plot.title = element_text(size = 25, face="bold", margin = margin(10,0,10,0)),
-       plot.background = element_rect(fill = "#F0EBCE"),
-       panel.background = element_rect(fill = "#F0EBCE"),
-       axis.text.x = element_text(size = 15),
-       axis.title.x = element_text(size = 20, margin = margin(11,0,10,0)),
-       axis.text.y = element_text(size = 15),
-       axis.title.y = element_text(size = 20, margin=margin(0,10,0,11)),
-       panel.grid.major = element_blank(),
-       panel.grid.minor = element_blank(),
-       plot.margin = margin(0,0.5,0,0, "cm"))
-```
 
-```{r}
-# additional plot for combination
-ma <- ggplot() + 
-  geom_point(aes(df$Marginal.Adhesion,df$Class)) + 
-  geom_smooth(aes(df$Marginal.Adhesion,df$Class),
-              method = "glm", se = FALSE, method.args = list(family = "binomial"), 
-              color = "#557153", size = 1.2) +
-scale_y_continuous(breaks = c(0, 1), labels = c("Benign", "Malignant")) +
-  theme(plot.background = element_rect(fill = "#F0EBCE"),
-       panel.background = element_rect(fill = "#F0EBCE"),
-       axis.text.x = element_text(size = 10),
-       axis.title.x = element_blank(),
-       axis.text.y = element_text(size = 10),
-       axis.title.y = element_blank(),
-       panel.grid.major = element_blank(),
-       panel.grid.minor = element_blank(),
-       plot.margin = margin(0,0.5, 0, 0, "cm")) +
-       annotate("text",x=6.5, y=0.2, label="Marginal adhesion", size = 6)
-
-ggsave(
-  here::here ("output/ma.png"), 
-  plot = ma)
-```
 From the plot, we observe that lower values of marginal adhesion are associated with benign tumors, while higher values tend to correlate with malignant tumors. The curve shows an increasing probability of malignancy as marginal adhesion values increase, suggesting that 'Marginal Adhesion' is a significant factor in the model and can be used to predict the malignancy of breast tumors with certain reliability.
 
-#### Bare nuclei plot
-```{r}
-# Bare nuclei plot
-ggplot() + 
-  geom_point(aes(df$Bare.Nuclei,df$Class)) + 
-  geom_smooth(aes(df$Bare.Nuclei,df$Class),
-              method = "glm", se = FALSE, method.args = list(family = "binomial"), 
-              color = "#557153", size = 1.2) +
-  ggtitle("Breast Cancer Diagnosis \nusing Bare nuclei") +
-  ylab("Tumour type") +
-  xlab("Bare nuclei") +
-scale_y_continuous(breaks = c(0, 1), labels = c("Benign", "Malignant")) +
-  theme(plot.title = element_text(size = 25, face="bold", margin = margin(10,0,10,0)),
-       plot.background = element_rect(fill = "#F0EBCE"),
-       panel.background = element_rect(fill = "#F0EBCE"),
-       axis.text.x = element_text(size = 15),
-       axis.title.x = element_text(size = 20, margin = margin(11,0,10,0)),
-       axis.text.y = element_text(size = 15),
-       axis.title.y = element_text(size = 20, margin=margin(0,10,0,11)),
-       panel.grid.major = element_blank(),
-       panel.grid.minor = element_blank(),
-       plot.margin = margin(0,0.5,0,0, "cm"))
-```
-```{r}
-# additional plot for combination
-bn <- ggplot() + 
-  geom_point(aes(df$Bare.Nuclei,df$Class)) + 
-  geom_smooth(aes(df$Bare.Nuclei,df$Class),
-              method = "glm", se = FALSE, method.args = list(family = "binomial"), 
-              color = "#557153", size = 1.2) +
-scale_y_continuous(breaks = c(0, 1), labels = c("Benign", "Malignant")) +
-  theme(plot.background = element_rect(fill = "#F0EBCE"),
-       panel.background = element_rect(fill = "#F0EBCE"),
-       axis.text.x = element_text(size = 10),
-       axis.title.x = element_blank(),
-       axis.text.y = element_text(size = 10),
-       axis.title.y = element_blank(),
-       panel.grid.major = element_blank(),
-       panel.grid.minor = element_blank(),
-       plot.margin = margin(0,0.5, 0, 0, "cm")) +
-       annotate("text",x=6.5, y=0.2, label="Bare nuclei", size = 6)
 
-ggsave(
-  here::here ("output/bn.png"), 
-  plot = bn)
-```
 The sigmoidal curve indicates that as the number of bare nuclei increases, so does the probability of the tumor being malignant. The distribution of data points suggests a clear trend where low values of bare nuclei are mostly associated with benign tumors, while high values are predominantly associated with malignant tumors. This implies that 'Bare Nuclei' is an important predictor in the model and can be significant in distinguishing between benign and malignant breast cancer cases, which is crucial for early diagnosis and treatment planning.
 
-#### Mitoses plot
-```{r}
-# Mitoses plot
-ggplot() + 
-  geom_point(aes(df$Mitoses,df$Class)) + 
-  geom_smooth(aes(df$Mitoses,df$Class),
-              method = "glm", se = FALSE, method.args = list(family = "binomial"), 
-              color = "#557153", size = 1.2) +
-  ggtitle("Breast Cancer Diagnosis \nusing Mitoses") +
-  ylab("Tumour type") +
-  xlab("Mitoses") +
-scale_y_continuous(breaks = c(0, 1), labels = c("Benign", "Malignant")) +
-  theme(plot.title = element_text(size = 25, face="bold",margin = margin(10,0,10,0)),
-       plot.background = element_rect(fill = "#F0EBCE"),
-       panel.background = element_rect(fill = "#F0EBCE"),
-       axis.text.x = element_text(size = 15),
-       axis.title.x = element_text(size = 20, margin = margin(11,0,10,0)),
-       axis.text.y = element_text(size = 15),
-       axis.title.y = element_text(size = 20, margin=margin(0,10,0,11)),
-       panel.grid.major = element_blank(),
-       panel.grid.minor = element_blank(),
-       plot.margin = margin(0,0.5,0,0, "cm"))
-```
-```{r}
-# additional plot for combination
-um <- ggplot() + 
-  geom_point(aes(df$Mitoses,df$Class)) + 
-  geom_smooth(aes(df$Mitoses,df$Class),
-              method = "glm", se = FALSE, method.args = list(family = "binomial"), 
-              color = "#557153", size = 1.2) +
-scale_y_continuous(breaks = c(0, 1), labels = c("Benign", "Malignant")) +
-  theme(plot.background = element_rect(fill = "#F0EBCE"),
-       panel.background = element_rect(fill = "#F0EBCE"),
-       axis.text.x = element_text(size = 10),
-       axis.title.x = element_blank(),
-       axis.text.y = element_text(size = 10),
-       axis.title.y = element_blank(),
-       panel.grid.major = element_blank(),
-       panel.grid.minor = element_blank(),
-       plot.margin = margin(0,0.5, 0, 0, "cm")) +
-       annotate("text",x=6.5, y=0.2, label="Mitoses", size = 6)
 
-ggsave(
-  here::here ("output/um.png"), 
-  plot = um)
-```
 The graph shows a sigmoidal curve, typical of logistic regression, indicating the probability of a tumor being malignant based on the rate of mitoses. The curve flattens as it approaches the higher mitoses values, suggesting that while increased mitotic activity is associated with malignancy, there is a level beyond which additional increases in mitoses do not significantly change the probability of the tumor being malignant. This could imply that 'Mitoses' is a useful predictor up to a certain point, after which other factors might be more indicative of malignancy in breast cancer diagnosis.
 
-#### bland chromatin plot
-```{r}
-# bland chromatin plot
-ggplot() + 
-  geom_point(aes(df$Bland.Chromatin,df$Class)) + 
-  geom_smooth(aes(df$Bland.Chromatin,df$Class),
-              method = "glm", se = FALSE, method.args = list(family = "binomial"), 
-              color = "#557153", size = 1.2) +
-  ggtitle("Breast Cancer Diagnosis \nusing Bland chromatin") +
-  ylab("Tumour type") +
-  xlab("Bland chromatin") +
-scale_y_continuous(breaks = c(0, 1), labels = c("Benign", "Malignant")) +
-  theme(plot.title = element_text(size = 25, face="bold", margin = margin(10,0,10,0)),
-       plot.background = element_rect(fill = "#F0EBCE"),
-       panel.background = element_rect(fill = "#F0EBCE"),
-       axis.text.x = element_text(size = 15),
-       axis.title.x = element_text(size = 20, margin = margin(11,0,10,0)),
-       axis.text.y = element_text(size = 15),
-       axis.title.y = element_text(size = 20, margin=margin(0,10,0,11)),
-       panel.grid.major = element_blank(),
-       panel.grid.minor = element_blank(),
-       plot.margin = margin(0,0.5,0,0, "cm"))
-```
-```{r}
-# additional plot for combination
-bc <- ggplot() + 
-  geom_point(aes(df$Bland.Chromatin,df$Class)) + 
-  geom_smooth(aes(df$Bland.Chromatin,df$Class),
-              method = "glm", se = FALSE, method.args = list(family = "binomial"), 
-              color = "#557153", size = 1.2) +
-scale_y_continuous(breaks = c(0, 1), labels = c("Benign", "Malignant")) +
-  theme(plot.background = element_rect(fill = "#F0EBCE"),
-       panel.background = element_rect(fill = "#F0EBCE"),
-       axis.text.x = element_text(size = 10),
-       axis.title.x = element_blank(),
-       axis.text.y = element_text(size = 10),
-       axis.title.y = element_blank(),
-       panel.grid.major = element_blank(),
-       panel.grid.minor = element_blank(),
-       plot.margin = margin(0,0.5, 0, 0, "cm")) +
-       annotate("text",x=6.5, y=0.2, label="Bland chromatin", size = 6)
 
-ggsave(
-  here::here ("output/bc.png"), 
-  plot = bc)
-```
 The logistic curve suggests that the probability of the tumor being malignant increases with the Bland Chromatin value. Most of the benign cases cluster at the lower end of the Bland Chromatin scale, while malignant cases are more frequently found at higher values, indicating that Bland Chromatin is a significant variable in predicting the malignancy of breast tumors.
 
-#### normal nucleoli plot
-```{r}
-# normal nucleoli plot
- ggplot() + 
-  geom_point(aes(df$Normal.Nucleoli,df$Class)) + 
-  geom_smooth(aes(df$Normal.Nucleoli,df$Class),
-              method = "glm", se = FALSE, method.args = list(family = "binomial"), 
-              color = "#557153", size = 1.2) +
-  ggtitle("Breast Cancer Diagnosis \nusing Normal nucleoli") +
-  ylab("Tumour type") +
-  xlab("Normal nucleoli") +
-scale_y_continuous(breaks = c(0, 1), labels = c("Benign", "Malignant")) +
-  theme(plot.title = element_text(size = 25, face="bold",margin = margin(10,0,10,0)),
-       plot.background = element_rect(fill = "#F0EBCE"),
-       panel.background = element_rect(fill = "#F0EBCE"),
-       axis.text.x = element_text(size = 15),
-       axis.title.x = element_text(size = 20, margin = margin(11,0,10,0)),
-       axis.text.y = element_text(size = 15),
-       axis.title.y = element_text(size = 20, margin=margin(0,10,0,11)),
-       panel.grid.major = element_blank(),
-       panel.grid.minor = element_blank(),
-       plot.margin = margin(0,0.5,0,0, "cm"))
-```
-```{r}
-# additional plot for combination
-nn <- ggplot() + 
-  geom_point(aes(df$Normal.Nucleoli,df$Class)) + 
-  geom_smooth(aes(df$Normal.Nucleoli,df$Class),
-              method = "glm", se = FALSE, method.args = list(family = "binomial"), 
-              color = "#557153", size = 1.2) +
-scale_y_continuous(breaks = c(0, 1), labels = c("Benign", "Malignant")) +
-  theme(plot.background = element_rect(fill = "#F0EBCE"),
-       panel.background = element_rect(fill = "#F0EBCE"),
-       axis.text.x = element_text(size = 10),
-       axis.title.x = element_blank(),
-       axis.text.y = element_text(size = 10),
-       axis.title.y = element_blank(),
-       panel.grid.major = element_blank(),
-       panel.grid.minor = element_blank(),
-       plot.margin = margin(0,0.5, 0, 0, "cm")) +
-       annotate("text",x=6.5, y=0.2, label="Normal nucleoli", size = 6)
 
-ggsave(
-  here::here ("output/nn.png"), 
-  plot = nn)
-```
 The sigmoid curve demonstrates that as the count of normal nucleoli increases, so does the likelihood of the tumor being malignant. The data points show a distinction between benign and malignant tumor types, with benign ones clustering at lower values of normal nucleoli, and malignant ones tending towards higher values. This suggests that the number of normal nucleoli can be a significant indicator for the malignancy of breast tumors in diagnostic models.
 
 # Conclusion
-### Including all Plots
 * Clump Thickness: Higher clump thickness values increase the likelihood of malignancy.
 * Marginal Adhesion: As marginal adhesion values rise, so does the probability of cancer being malignant.
 * Bare Nuclei: The presence of a higher number of bare nuclei is associated with a greater chance of malignancy.
