@@ -4,28 +4,29 @@ This is a Breast cancer Wisconsin (original) dataset contains real data of 699 o
 
 # Installation
 To set up the R package environment for this project, run the following command from the project directory:
-Final Report You can choose whether or not to include code in the final report. To exclude code and provide a cleaner view for collaborators, open the file "render_report.R" and set the parameter: production: TRUE in the YAML header This will generate a report without code. Conversely, to include code so that the entire report can be thoroughly examined, open the file "05_render_report.R" and set params: production: FALSE in the YAML header.This will generate a report with the code included.
+- Final Report You can choose whether or not to include code in the final report.
+- To exclude code and provide a cleaner view for collaborators, open the file "render_report.R" and set the parameter: production: TRUE in the YAML header This will generate a report without code.
+- To include code so that the entire report can be thoroughly examined, open the file "render_report.R" and set params: production: FALSE in the YAML header.This will generate a report with the code included.
 
 # How to create the final report
 ## Clean Data
 To clean the initial dataset and prepare it for further analysis, use: 
-make clean_data/clean_data.rds
+- make clean_data/clean_data.rds
 
 ## Generate Tables and Plots
 Generate detailed analytical outputs and visualizations by executing the commands below:
-make output/make_table.rds
-make output/heat_map.png
-make output/ct.png
-make output/bn.png
-make output/bc.png
-make output/ma.png
-make output/nn.png
-make output/um.png
+- make output/make_table.rds
+- make output/heat_map.png
+- make output/ct.png
+- make output/bn.png
+- make output/bc.png
+- make output/ma.png
+- make output/nn.png
+- make output/um.png
 
 ## Building the Report
 To compile the final report into an HTML format:
-make report.html
-
+- make report.html
 
 ## Final report using git bash terminal
 - Set the the project directory in the bash terminal using the cd command
