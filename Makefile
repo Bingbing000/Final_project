@@ -1,4 +1,9 @@
 #! TO DO:
+#! add a rule to setup rent
+install:
+	Rscript -e "renv::restore()"
+
+#! TO DO:
 #! add a rule to build the report
 report.html: report.Rmd \
  clean_data/clean_data.rds output/make_table.rds output/heat_map.png \
