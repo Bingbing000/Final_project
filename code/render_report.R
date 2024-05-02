@@ -3,9 +3,6 @@ here::i_am(
 )
 
 WHICH_CONFIG <- Sys.getenv("WHICH_CONFIG")
-config_list <- config::get(
-  config=WHICH_CONFIG
-)
 
 report_filename <- paste(
   "report_config_", WHICH_CONFIG, ".html", sep=""
