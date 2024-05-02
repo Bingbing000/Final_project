@@ -27,6 +27,11 @@ Generate detailed analytical outputs and visualizations by executing the command
 ## Building the Report
 To compile the final report into an HTML format:
 - make report.html
+  
+## Running the Docker Container to Compile Report
+To compile the report using a Docker container, execute the following command:
+- make run-container
+This command will run a Docker container with the project directory mounted, allowing the compiled report to be saved to the "report" directory in your project folder.
 
 ## Final report using git bash terminal
 - Set the the project directory in the bash terminal using the cd command
@@ -39,3 +44,6 @@ To compile the final report into an HTML format:
 
 # Conclusion
 This README provides a comprehensive guide to setting up and running the project, ensuring that anyone can replicate the analysis and generate the report with minimal setup.
+- Replace `final` with the name of your Docker image.
+This will update your Makefile with the target to run the Docker container and compile the report and provide clear instructions in your README.md on how to use this target.
+
