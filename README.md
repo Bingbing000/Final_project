@@ -28,10 +28,19 @@ Generate detailed analytical outputs and visualizations by executing the command
 To compile the final report into an HTML format:
 - make report.html
   
+## Building the Docker Image
+
+To build the Docker image, ensure that you have Docker installed on your machine. Then, navigate to the project directory containing the Dockerfile and execute the following command:
+
+```bash
+docker build -t your-image-name .
+- Replace your-image-name with the desired name for your Docker image. This command will build the Docker image using the Dockerfile located in the current directory (.).
+- Once the build process is complete, you can proceed to run the Docker container using the instructions provided in the previous section.
+
 ## Running the Docker Container to Compile Report
 To compile the report using a Docker container, execute the following command:
 - make run-container
-This command will run a Docker container with the project directory mounted, allowing the compiled report to be saved to the "report" directory in your project folder.
+- This command will run a Docker container with the project directory mounted, allowing the compiled report to be saved to the "report" directory in your project folder.
 
 ## Final report using git bash terminal
 - Set the the project directory in the bash terminal using the cd command
