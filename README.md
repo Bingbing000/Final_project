@@ -34,6 +34,8 @@ To build the Docker image, ensure that you have Docker installed on your machine
 
 ```bash
 docker build -t your-image-name .
+```
+
 - Replace your-image-name with the desired name for your Docker image. This command will build the Docker image using the Dockerfile located in the current directory (.).
 - Once the build process is complete, you can proceed to run the Docker container using the instructions provided in the previous section.
 
